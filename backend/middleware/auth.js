@@ -1,20 +1,22 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-module.exports = (req, res, next) => {
-  // Get token from header
-  const token = req.header('x-auth-token');
+const jwtSecret = process.env.JWT_SECRET ;
+//fetch the token from Authorization API
+function authMiddleware(req, res, next) {
+ const auth = req.headers.authorization;
+ if (!auth) return res.status(401).json({ error: 'Missing Authorization header' });
+ const parts = auth.split(' ');
+ if (parts.length !== 2 || parts[0] !== 'Bearer') return res.status(401).json({ error: 'Malformed Authorization header' });
+ const token = parts[1];
+ try {
+   const payload = jwt.verify(token, jwtSecret);
+   req.userId = payload.userId;
+   req.userRole = payload.role;
+   next();
+ } catch (err) {
+   return res.status(401).json({ error: 'Invalid or expired token' });
+ }
+}
 
-  // Check if no token
-  if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
-  }
-
-  // Verify token
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
-  }
-};
+module.exports = authMiddleware;

@@ -32,14 +32,6 @@ router.get('/', auth, async (req, res) => {
         where,
         include: {
           department: true,
-          manager: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true
-            }
-          }
         },
         skip,
         take: parseInt(limit),
@@ -60,30 +52,14 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get single employee
+// Get single employee //start from 3,4,5
 router.get('/:id', auth, async (req, res) => {
   try {
     const employee = await prisma.employee.findUnique({
       where: { id: parseInt(req.params.id) },
       include: {
         department: true,
-        manager: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true
-          }
-        },
-        directReports: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            position: true
-          }
-        }
+      
       }
     });
 
@@ -105,12 +81,9 @@ router.post('/', [auth, admin], async (req, res) => {
       firstName,
       lastName,
       email,
-      phone,
-      address,
+      employeeNo,
       position,
-      salary,
       departmentId,
-      managerId
     } = req.body;
 
     // Check if email already exists
@@ -147,10 +120,8 @@ router.post('/', [auth, admin], async (req, res) => {
         firstName,
         lastName,
         email,
-        phone,
-        address,
+        employeeNo,
         position,
-        salary: parseFloat(salary),
         department: { connect: { id: departmentId } },
         ...(managerId && { manager: { connect: { id: managerId } } })
       },
@@ -179,7 +150,6 @@ router.put('/:id', [auth, admin], async (req, res) => {
       position,
       salary,
       departmentId,
-      managerId
     } = req.body;
 
     // Check if employee exists

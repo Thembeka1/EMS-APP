@@ -9,78 +9,92 @@ async function main() {
   // Create admin user
   const adminPassword = await bcrypt.hash('admin123', 10);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
+    where: { email: 'thembeka@admin.com' },
     update: {},
     create: {
-      email: 'admin@example.com',
-      name: 'Admin User',
+      email: 'thembeka@admin.com',
+      name: 'Thembeka Biyela',
       password: adminPassword,
-      role: 'admin',
+      role: 'ADMIN',
     },
   });
 
   // Create departments
   const departments = await Promise.all([
     prisma.department.upsert({
-      where: { name: 'Engineering' },
+      where: { name: 'Finance' },
       update: {},
-      create: { name: 'Engineering', 
-        description: 'Software development and engineering' },
+      create: { name: 'Finance', 
+      description: 'Managing the companys financial activities' },
     }),
     
     prisma.department.upsert({
       where: { name: 'HR' },
       update: {},
       create: { name: 'HR', 
-        description: 'Human Resources' },
+      description: 'Human Resources' },
     }),
     prisma.department.upsert({
-      where: { name: 'Marketing' },
+      where: { name: 'IT' },
       update: {},
-      create: { name: 'Marketing', description: 'Marketing and Communications' },
+      create: { name: 'IT', 
+      description: 'Software development and engineering' },
     }),
   ]);
 
   // Create sample employees
   const employees = await Promise.all([
     prisma.employee.upsert({
-      where: { email: 'john.doe@example.com' },
+      where: { email: 'sbongile@user.com' },
       update: {},
       create: {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com',
-        phone: '123-456-7890',
-        address: '123 Main St',
-        position: 'Senior Developer',
-        salary: 90000,
+        firstName: 'Sbongile',
+        lastName: 'Rathokwane',
+        email: 'sbongile@user.com',
+        employeeNo: '1640',
+        position: 'Accountant',
         department: {
           connect: { id: departments[0].id }
         },
         hireDate: new Date(),
       },
     }),
+
     prisma.employee.upsert({
-      where: { email: 'jane.smith@example.com' },
+      where: { email: 'simamkele@user.com' },
       update: {},
       create: {
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane.smith@example.com',
-        phone: '123-456-7891',
-        address: '456 Oak Ave',
+        firstName: 'Simamkele',
+        lastName: 'Mampondo',
+        email: 'simamkele@user.com',
+        employeeNo: '7891',
         position: 'HR Manager',
-        salary: 85000,
         department: {
           connect: { id: departments[1].id }
         },
         hireDate: new Date(),
       },
     }),
+
+    prisma.employee.upsert({
+      where: { email: 'dineo@user.com' },
+      update: {},
+      create: {
+        firstName: 'Dineo',
+        lastName: 'Makofane',
+        email: 'dineo@user.com',
+        employeeNo: '7790',
+        position: 'Front End Developer',
+        department: {
+          connect: { id: departments[2].id }
+        },
+        hireDate: new Date(),
+      },
+    })
   ]);
 
   console.log('Seed data created successfully!');
-  console.log('Admin user created with email: admin@example.com and password: admin123');
+  console.log('Admin user created with email: thembeka@admin.com and password: admin123');
 }
 
 main()

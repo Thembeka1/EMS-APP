@@ -24,7 +24,7 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/employees', employeeRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (req, res) => { //its woirking
   res.status(200).json({ status: 'ok' });
 });
 

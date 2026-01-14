@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name ,  role} = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -29,7 +29,8 @@ router.post('/register', async (req, res) => {
       data: {
         email,
         password: hashedPassword,
-        name
+        name,
+        role
       }
     });
 
@@ -37,7 +38,7 @@ router.post('/register', async (req, res) => {
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.EXPIRES_IN }
     );
 
     res.status(201).json({ token });
