@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔴 THIS LINE IS CRITICAL
+    // THIS LINE IS CRITICAL
     req.user = decoded;
 
     next();
