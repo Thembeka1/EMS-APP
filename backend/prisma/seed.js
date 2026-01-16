@@ -90,6 +90,22 @@ async function main() {
         },
         hireDate: new Date(),
       },
+    }),
+
+    prisma.employee.upsert({
+      where: { email: 'xolelwa@user.com' },
+      update: {},
+      create: {
+        firstName: 'Xolelwa',
+        lastName: 'Cekiso',
+        email: 'xolelwa@user.com',
+        employeeNo: '8890',
+        position: 'Back End Developer',
+        department: {
+          connect: { id: departments[2].id }
+        },
+        hireDate: new Date(),
+      },
     })
   ]);
 

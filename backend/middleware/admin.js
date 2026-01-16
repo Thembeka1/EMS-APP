@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
       where: { id: req.user.userId }
     });
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Access denied. Admin only.' });
     }
 
@@ -18,3 +18,6 @@ module.exports = async (req, res, next) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+

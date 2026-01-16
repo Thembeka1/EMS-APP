@@ -104,16 +104,6 @@ router.post('/', [auth, admin], async (req, res) => {
       return res.status(400).json({ message: 'Department not found' });
     }
 
-    // Check if manager exists if provided
-    if (managerId) {
-      const manager = await prisma.employee.findUnique({
-        where: { id: managerId }
-      });
-
-      if (!manager) {
-        return res.status(400).json({ message: 'Manager not found' });
-      }
-    }
 
     const employee = await prisma.employee.create({
       data: {
@@ -122,12 +112,10 @@ router.post('/', [auth, admin], async (req, res) => {
         email,
         employeeNo,
         position,
-        department: { connect: { id: departmentId } },
-        ...(managerId && { manager: { connect: { id: managerId } } })
+        department: { connect: { id: departmentId } }
       },
       include: {
         department: true,
-        manager: true
       }
     });
 
@@ -145,10 +133,8 @@ router.put('/:id', [auth, admin], async (req, res) => {
       firstName,
       lastName,
       email,
-      phone,
-      address,
+      employeeNo,
       position,
-      salary,
       departmentId,
     } = req.body;
 
@@ -183,16 +169,7 @@ router.put('/:id', [auth, admin], async (req, res) => {
       }
     }
 
-    // Check if manager exists if being updated
-    if (managerId) {
-      const manager = await prisma.employee.findUnique({
-        where: { id: managerId }
-      });
-
-      if (!manager) {
-        return res.status(400).json({ message: 'Manager not found' });
-      }
-    }
+   
 
     const updatedEmployee = await prisma.employee.update({
       where: { id: parseInt(req.params.id) },
@@ -200,18 +177,13 @@ router.put('/:id', [auth, admin], async (req, res) => {
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
         ...(email && { email }),
-        ...(phone !== undefined && { phone }),
-        ...(address && { address }),
+        ...(employeeNo && { employeeNo }),
         ...(position && { position }),
-        ...(salary && { salary: parseFloat(salary) }),
         ...(departmentId && { department: { connect: { id: departmentId } } }),
-        ...(managerId !== undefined && {
-          manager: managerId ? { connect: { id: managerId } } : { disconnect: true }
-        })
+        
       },
       include: {
         department: true,
-        manager: true
       }
     });
 
@@ -227,22 +199,14 @@ router.delete('/:id', [auth, admin], async (req, res) => {
   try {
     // Check if employee exists
     const employee = await prisma.employee.findUnique({
-      where: { id: parseInt(req.params.id) },
-      include: {
-        directReports: true
-      }
+      where: { id: parseInt(req.params.id) }
     });
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    // Check if employee has direct reports
-    if (employee.directReports.length > 0) {
-      return res.status(400).json({
-        message: 'Cannot delete employee with direct reports. Reassign or delete them first.'
-      });
-    }
+    
 
     await prisma.employee.delete({
       where: { id: parseInt(req.params.id) }
